@@ -140,5 +140,5 @@ Tags: [weather]
 <p>After exploring all of the different potential factors in my model, I built my model.</p>
 <pre class="r"><code>fit.weather = gam :: gam(TemperatureC ~ poly(Pressure,3) + Conditions + poly(TimeSAST,11) + poly(Humidity,1) + poly(month,4), data = weather_data)</code></pre>
 <p>After building this GAM model, I ran the model 20 times and found the average error for each individual trial and then determiend the average error for the model as a whole</p>
-<pre><code>## [1] &quot;the average error for this model with 10 repetitions is 0.118440, the maximum error is 0.124716, and the minimum error is 0.111188&quot;</code></pre>
+<pre><code>## [1] &quot;the average error for this model with 10 repetitions is 0.118924, the maximum error is 0.124913, and the minimum error is 0.110912&quot;</code></pre>
 <p>The average error for this model appears to be around 12%, which, considering the chaotic nature of weather, I beleive to be a pretty resonable margin. From this, I think it can be concluded that a GAM model is rather effective in predicting temperatures within a given year. However, it remains to be seen whether or not this model will be effective in extrapolating temperature data into the future.</p>

@@ -1,0 +1,51 @@
+---
+title: Weather Analysis part2
+author: ~
+date: '2017-06-20'
+slug: weather-analysis-part2
+categories: []
+tags: []
+Categories: []
+Description: ''
+Tags: [weather]
+---
+
+
+
+<p>After some further thought, I modified my dataset by adding a new column that shifted all of the temperature data down by one row, allowing me to add the temperature of the previous hour to my model.</p>
+<pre><code>## Loading required package: splines</code></pre>
+<pre><code>## Loading required package: foreach</code></pre>
+<pre><code>## Loaded gam 1.14-4</code></pre>
+<p><img src="/post/2017-06-20-weather-analysis-part2_files/figure-html/temp%20plot-1.png" width="672" /> Now this graph shows an obvious and strong relationship between the previous hour’s temperature and the current hour’s temperature, which would make a great deal of sense.</p>
+<pre><code>## Analysis of Deviance Table
+## 
+## Model 1: TemperatureC ~ poly(Pressure, 3) + Conditions + poly(TimeSAST, 
+##     11) + poly(Humidity, 4) + poly(month, 4)
+## Model 2: TemperatureC ~ poly(tempt_1, 1) + poly(Pressure, 3) + Conditions + 
+##     poly(TimeSAST, 11) + poly(Humidity, 4) + poly(month, 4)
+## Model 3: TemperatureC ~ poly(tempt_1, 2) + poly(Pressure, 3) + Conditions + 
+##     poly(TimeSAST, 11) + poly(Humidity, 4) + poly(month, 4)
+## Model 4: TemperatureC ~ poly(tempt_1, 3) + poly(Pressure, 3) + Conditions + 
+##     poly(TimeSAST, 11) + poly(Humidity, 4) + poly(month, 4)
+## Model 5: TemperatureC ~ poly(tempt_1, 4) + poly(Pressure, 3) + Conditions + 
+##     poly(TimeSAST, 11) + poly(Humidity, 4) + poly(month, 4)
+## Model 6: TemperatureC ~ poly(tempt_1, 5) + poly(Pressure, 3) + Conditions + 
+##     poly(TimeSAST, 11) + poly(Humidity, 4) + poly(month, 4)
+## Model 7: TemperatureC ~ poly(tempt_1, 6) + poly(Pressure, 3) + Conditions + 
+##     poly(TimeSAST, 11) + poly(Humidity, 4) + poly(month, 4)
+## Model 8: TemperatureC ~ poly(tempt_1, 7) + poly(Pressure, 3) + Conditions + 
+##     poly(TimeSAST, 11) + poly(Humidity, 4) + poly(month, 4)
+##   Resid. Df Resid. Dev Df Deviance  Pr(&gt;Chi)    
+## 1     11875      52372                          
+## 2     11874      10574  1    41798 &lt; 2.2e-16 ***
+## 3     11873      10532  1       42 4.909e-12 ***
+## 4     11872      10528  1        4 0.0387389 *  
+## 5     11871      10525  1        3 0.0891183 .  
+## 6     11870      10494  1       32 2.189e-09 ***
+## 7     11869      10482  1       12 0.0002191 ***
+## 8     11868      10481  1        0 0.4885039    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>It did surprise me that the model was significant up to 6 degrees of freedom. After adding this function to my model, I ran the tests again.</p>
+<pre><code>## [1] &quot;the average error for this model with 20 repetitions is 0.047540, the maximum error is 0.050677, and the minimum error is 0.046095&quot;</code></pre>
+<p>The ~7% change that this function makes in the model’s accuracy is really quite significant. An error of less than 5% is really quite good by most any standard. The next step is to see how effective the temperatures of times further back are in predicting the present temperature. After that it will be seen whether or not I can use this to move beyond current predictions and actually be able to predict future temperatures with any accuracy.</p>
