@@ -137,3 +137,5 @@ sprintf("the average error for this model with 10 repetitions is %f, the maximum
 
 The average error for this model appears to be around 12%, which, considering the chaotic nature of weather, I beleive to be a pretty resonable margin. From this, I think it can be concluded that a GAM model is rather effective in predicting temperatures within a given year. However, it remains to be seen whether or not this model will be effective in extrapolating temperature data into the future.
 
+
+

@@ -1,0 +1,53 @@
+---
+title: Weather Analysis part2
+author: ~
+date: '2017-06-20'
+slug: weather-analysis-part2
+categories: []
+tags: []
+Categories: []
+Description: ''
+Tags: [weather]
+---
+
+After some further thought, I modified my dataset by adding a new column that shifted all of the temperature data down by one row, allowing me to add the temperature of the previous hour to my model.
+
+```{r temp plot, echo=FALSE}
+library(gam)
+library(ggplot2)
+weather_data = read.csv("C:/Users/Student/Documents/R/Data Analysis/weather2016edited.csv")
+ggplot(weather_data, aes(x = TemperatureC, y = tempt_1, color = tempt_1)) + geom_point()
+```
+Now this graph shows an obvious and strong relationship between the previous hour's temperature and the current hour's temperature, which would make a great deal of sense.
+```{r temp_1, echo = FALSE}
+t0 = gam(TemperatureC ~ poly(Pressure,3) + Conditions + poly(TimeSAST,11) + poly(Humidity,4) + poly(month,4), data = weather_data)
+t1 = gam(TemperatureC ~ poly(tempt_1,1) + poly(Pressure,3) + Conditions + poly(TimeSAST,11) + poly(Humidity,4) + poly(month,4), data = weather_data)
+t2 = gam(TemperatureC ~ poly(tempt_1,2) + poly(Pressure,3) + Conditions + poly(TimeSAST,11) + poly(Humidity,4) + poly(month,4), data = weather_data)
+t3 = gam(TemperatureC ~ poly(tempt_1,3) + poly(Pressure,3) + Conditions + poly(TimeSAST,11) + poly(Humidity,4) + poly(month,4), data = weather_data)
+t4 = gam(TemperatureC ~ poly(tempt_1,4) + poly(Pressure,3) + Conditions + poly(TimeSAST,11) + poly(Humidity,4) + poly(month,4), data = weather_data)
+t5 = gam(TemperatureC ~ poly(tempt_1,5) + poly(Pressure,3) + Conditions + poly(TimeSAST,11) + poly(Humidity,4) + poly(month,4), data = weather_data)
+t6 = gam(TemperatureC ~ poly(tempt_1,6) + poly(Pressure,3) + Conditions + poly(TimeSAST,11) + poly(Humidity,4) + poly(month,4), data = weather_data)
+t7 = gam(TemperatureC ~ poly(tempt_1,7) + poly(Pressure,3) + Conditions + poly(TimeSAST,11) + poly(Humidity,4) + poly(month,4), data = weather_data)
+
+anova(t0,t1,t2,t3,t4,t5,t6,t7)
+```
+It did surprise me that the model was significant up to 6 degrees of freedom. After adding this function to my model, I ran the tests again.
+```{r error_t, echo = FALSE}
+seeds = sample(1:10000,20,replace = TRUE)
+error = c()
+for(i in seeds){
+  weather_data = read.csv("C:/Users/Student/Documents/R/Data Analysis/weather2016edited.csv")
+  set.seed(i)
+  weather_data$month = as.numeric(weather_data$month)
+  train.index = sample(c(T, F), nrow(weather_data), replace = TRUE, prob = c(0.8, 0.2))
+  weather_data = split(weather_data, train.index)
+  names(weather_data) = c("test", "train")
+  remove(train.index)
+  fit.weather = gam :: gam(TemperatureC ~ poly(tempt_1,6) + poly(Pressure,3) + Conditions + poly(TimeSAST,11) + poly(Humidity,1) + poly(month,4), data = weather_data$train)
+  weather_data$test$predict = predict(fit.weather, newdata = weather_data$test)
+  weather_data$test$error = abs(weather_data$test$predict - weather_data$test$TemperatureC)/weather_data$test$TemperatureC
+  error = c(error,mean(weather_data$test$error))
+}
+sprintf("the average error for this model with 20 repetitions is %f, the maximum error is %f, and the minimum error is %f", mean(error), max(error), min(error))
+```
+The ~7% change that this function makes in the model's accuracy is really quite significant. An error of less than 5% is really quite good by most any standard. The next step is to see how effective the temperatures of times further back are in predicting the present temperature. After that it will be seen whether or not I can use this to move beyond current predictions and actually be able to predict future temperatures with any accuracy.
